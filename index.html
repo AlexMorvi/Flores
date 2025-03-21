@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flores Amarillas para Alison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #e0f7fa);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .ground {
+            background: linear-gradient(to bottom, #8BC34A, #558B2F);
+            height: 20vh;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            border-top: 3px solid #7CB342;
+            z-index: 2;
+        }
+        
+        .name-container {
+            position: absolute;
+            top: 20%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+        
+        .letter {
+            display: inline-block;
+            font-size: 7rem;
+            font-weight: bold;
+            margin: 0 10px;
+            color: white;
+            text-shadow: 0 0 10px #FF9800, 0 0 20px #FF9800;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .letter:nth-child(2n) { animation-delay: 0.5s; }
+        .letter:nth-child(3n) { animation-delay: 1s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .flower-container {
+            position: absolute;
+            transition: transform 0.5s ease, top 1.5s cubic-bezier(0.2, 0.8, 0.2, 1.2);
+            z-index: 5;
+        }
+        
+        .flower-container.sunflower {
+            width: 180px;
+            height: 180px;
+        }
+        
+        .flower-container.rose {
+            width: 140px;
+            height: 140px;
+        }
+        
+        .flower-container.large {
+            width: 300px;
+            height: 300px;
+            z-index: 6;
+        }
+        
+        .message-container {
+            position: fixed;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        .message {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-size: 1.2rem;
+            color: #333;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+        }
+        
+        .message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #FFF;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        
+        .love-message {
+            position: absolute;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FF4081;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            opacity: 0;
+            z-index: 20;
+            animation: fadeInOut 7s ease forwards;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: scale(0.8) translateY(10px); }
+            10% { opacity: 1; transform: scale(1) translateY(0); }
+            80% { opacity: 1; transform: scale(1) translateY(0); }
+            100% { opacity: 0; transform: scale(0.8) translateY(-10px); }
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 2rem;
+            color: #FF4081;
+            opacity: 0;
+            animation: floatHeart 4s ease-in-out forwards;
+            z-index: 8;
+        }
+        
+        @keyframes floatHeart {
+            0% { opacity: 0; transform: translateY(0) scale(0.8); }
+            10% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
+        }
+        
+        .fallback-flower {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .rose.fallback-flower {
+            font-size: 4rem;
+        }
+        
+        .large .fallback-flower {
+            font-size: 10rem;
+            animation: spin 8s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .surprise-message {
+            position: absolute;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FF9800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            z-index: 20;
+            animation: surpriseFade 7s ease forwards;
+        }
+        
+        @keyframes surpriseFade {
+            0% { opacity: 0; transform: scale(0.8); }
+            10% { opacity: 1; transform: scale(1.2); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        
+        .envelope-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(135, 206, 235, 0.8);
+            z-index: 1000;
+        }
+        
+        .envelope {
+            width: 300px;
+            height: 200px;
+            background-color: #FF9800;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s ease;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .envelope:hover { transform: translateY(-10px); }
+        
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #FFCC80;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid #FF9800;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .envelope-heart {
+            font-size: 5rem;
+            color: #FF4081;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .envelope-flap {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #FFB74D;
+            clip-path: polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%);
+            transform-origin: top;
+            transition: transform 1s ease;
+            border: 2px solid #FF9800;
+        }
+        
+        .envelope.open .envelope-flap { transform: rotateX(180deg); }
+        
+        .poem-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        .poem-container.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .poem {
+            background-color: #FFF;
+            padding: 40px;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .poem h2 {
+            text-align: center;
+            color: #FF4081;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .poem p {
+            text-align: center;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .poem-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .poem-continue {
+            display: block;
+            width: 200px;
+            margin: 20px auto 0;
+            padding: 12px 0;
+            background-color: #FF4081;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .poem-continue:hover {
+            background-color: #E91E63;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(233, 30, 99, 0.3);
+        }
+        
+        .main-content {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        
+        .main-content.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: #FFF;
+            opacity: 0.8;
+            animation: confettiFall linear forwards;
+            z-index: 3;
+        }
+        
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(calc(100vh + 100px)) rotate(720deg); opacity: 0; }
+        }
+        
+        @media (max-width: 768px) {
+            .letter {
+                font-size: 5rem;
+                margin: 0 5px;
+            }
+            
+            .flower-container.sunflower {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .flower-container.rose {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .flower-container.large {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .message {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+            
+            .poem { padding: 20px; }
+            .poem h2 { font-size: 1.6rem; }
+            .poem p { font-size: 1rem; }
+            .large .fallback-flower { font-size: 7rem; }
+        }
+        
+        @media (max-width: 480px) {
+            .letter {
+                font-size: 3.5rem;
+                margin: 0 2px;
+            }
+            
+            .flower-container.sunflower {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .flower-container.rose {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .flower-container.large {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .fallback-flower { font-size: 3rem; }
+            .rose.fallback-flower { font-size: 2.5rem; }
+            .large .fallback-flower { font-size: 5rem; }
+            .envelope { width: 250px; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Envelope Container -->
+    <div class="envelope-container" id="envelope-container">
+        <div class="envelope" id="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-front">
+                <div class="envelope-heart">❤️</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Poem Container -->
+    <div class="poem-container" id="poem-container">
+        <div class="poem">
+            <button class="poem-close" id="poem-close">×</button>
+            <h2>Para mi Alison</h2>
+            <p>
+                Como girasoles que siguen al sol,<br>
+                Mis pensamientos te buscan a cada momento.<br>
+                Tu sonrisa, luz de mi corazón,<br>
+                Ilumina mi camino, mi firmamento.
+            </p>
+            <p>
+                Eres la melodía de mi canción,<br>
+                El latido constante en mi pecho.<br>
+                Te ofrezco flores de mi amor,<br>
+                Y versos nacidos del afecto.
+            </p>
+            <p>
+                En cada pétalo amarillo verás<br>
+                Lo inmenso de mi sentir por ti.<br>
+                Mi Alison, mi dulce verdad,<br>
+                El amor más hermoso que conocí.
+            </p>
+            <button class="poem-continue" id="poem-continue">Continuar ✨</button>
+        </div>
+    </div>
+    
+    <!-- Main Content - Flowers -->
+    <div class="main-content" id="main-content">
+        <div class="message-container">
+            <div class="message" id="message">Toca las letras para sembrar flores 🌻</div>
+        </div>
+        
+        <div class="name-container" id="name-container"></div>
+        
+        <div class="controls">
+            <button class="btn" id="reset-btn">Reiniciar</button>
+            <button class="btn" id="special-btn">Sorpresa ✨</button>
+            <button class="btn" id="toggle-btn">Cambiar a rosas</button>
+        </div>
+        
+        <div class="ground" id="ground"></div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const name = "ALISON";
+            const ground = document.getElementById('ground');
+            const nameContainer = document.getElementById('name-container');
+            const message = document.getElementById('message');
+            const resetBtn = document.getElementById('reset-btn');
+            const specialBtn = document.getElementById('special-btn');
+            const toggleBtn = document.getElementById('toggle-btn');
+            const envelope = document.getElementById('envelope');
+            const envelopeContainer = document.getElementById('envelope-container');
+            const poemContainer = document.getElementById('poem-container');
+            const poemClose = document.getElementById('poem-close');
+            const poemContinue = document.getElementById('poem-continue');
+            const mainContent = document.getElementById('main-content');
+            
+            let flowerType = 'sunflower'; // default flower type
+            let flowers = [];
+            
+            // Mensajes de amor más elaborados
+            const loveMessages = [
+                "Tus ojos son el jardín donde mi corazón florece eternamente 💖",
+                "Eres el sol que necesito para florecer cada mañana, mi Alison 🌻",
+                "Como un girasol que sigue la luz, mis pensamientos siempre te buscan 💭",
+                "No hay distancia que nuestro amor no pueda recorrer, ni tiempo que lo marchite 💗",
+                "En el jardín de mi corazón, tú eres la flor más preciosa y radiante ✨",
+                "Cada latido de mi corazón susurra tu nombre con infinito amor 💓",
+                "Mi amor por ti crece como estas flores, sin límites y eternamente 🌷",
+                "Eres la poesía que da sentido a cada verso de mi existencia 📝",
+                "Nuestro amor es como estas flores: hermoso, vibrante y lleno de vida 🌺",
+                "Contigo descubrí el verdadero significado de amar sin condiciones 💘"
+            ];
+            
+            // Mensajes sorpresa
+            const surpriseMessages = [
+                "ERES MI TODO, ALISON",
+                "TE AMO INFINITAMENTE",
+                "CONTIGO SIEMPRE",
+                "MI CORAZÓN ES TUYO",
+                "ERES MI LUZ",
+                "POR SIEMPRE JUNTOS"
+            ];
+            
+            // Envelope and poem interactions
+            envelope.addEventListener('click', () => {
+                envelope.classList.add('open');
+                setTimeout(() => {
+                    envelopeContainer.style.display = 'none';
+                    poemContainer.classList.add('visible');
+                }, 1000);
+            });
+            
+            const showMainContent = () => {
+                poemContainer.classList.remove('visible');
+                setTimeout(() => {
+                    mainContent.classList.add('visible');
+                    createName();
+                    showMessage('Toca las letras de ALISON para sembrar flores 🌻');
+                }, 500);
+            };
+            
+            poemClose.addEventListener('click', showMainContent);
+            poemContinue.addEventListener('click', showMainContent);
+            
+            // Create and display the name
+            function createName() {
+                nameContainer.innerHTML = '';
+                
+                for (let i = 0; i < name.length; i++) {
+                    const letter = document.createElement('div');
+                    letter.className = 'letter';
+                    letter.textContent = name[i];
+                    
+                    letter.addEventListener('click', () => {
+                        growFlower(
+                            nameContainer.offsetLeft + letter.offsetLeft + letter.offsetWidth / 2,
+                            nameContainer.offsetTop + letter.offsetTop + letter.offsetHeight / 2
+                        );
+                        
+                        letter.style.transform = 'scale(1.3) translateY(-15px)';
+                        setTimeout(() => {
+                            letter.style.transform = '';
+                        }, 300);
+                        
+                        showLoveMessage();
+                    });
+                    
+                    nameContainer.appendChild(letter);
+                }
+            }
+            
+            // Show love message - using array of messages
+            function showLoveMessage() {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'love-message';
+                messageEl.textContent = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+                
+                // Random position on screen
+                const x = Math.random() * (window.innerWidth - 200) + 100;
+                const y = Math.random() * (window.innerHeight - 200) + 100;
+                
+                messageEl.style.left = `${x}px`;
+                messageEl.style.top = `${y}px`;
+                
+                document.body.appendChild(messageEl);
+                
+                // Remove after animation completes (7 seconds)
+                setTimeout(() => {
+                    messageEl.remove();
+                }, 7000);
+                
+                // Add some floating hearts
+                createHearts(x, y);
+            }
+            
+            // Create floating hearts
+            function createHearts(x, y) {
+                const heartCount = Math.floor(Math.random() * 4) + 2;
+                
+                for (let i = 0; i < heartCount; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.innerHTML = '❤️';
+                    
+                    const offsetX = (Math.random() - 0.5) * 80;
+                    const offsetY = (Math.random() - 0.5) * 40;
+                    
+                    heart.style.left = `${x + offsetX}px`;
+                    heart.style.top = `${y + offsetY}px`;
+                    heart.style.animationDelay = `${Math.random() * 0.5}s`;
+                    
+                    document.body.appendChild(heart);
+                    
+                    // Remove after animation completes
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 4000);
+                }
+            }
+            
+            // Crear confeti
+            function createConfetti() {
+                const colors = ['#FF9800', '#FFEB3B', '#FFC107', '#FF5722', '#E91E63'];
+                
+                for (let i = 0; i < 100; i++) {
+                    setTimeout(() => {
+                        const confetti = document.createElement('div');
+                        confetti.className = 'confetti';
+                        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                        confetti.style.left = `${Math.random() * window.innerWidth}px`;
+                        confetti.style.width = `${Math.random() * 10 + 5}px`;
+                        confetti.style.height = `${Math.random() * 15 + 10}px`;
+                        confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                        
+                        document.body.appendChild(confetti);
+                        
+                        // Remove after animation completes
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 5000);
+                    }, i * 50);
+                }
+            }
+            
+            // Create a fallback emoji flower
+            function createFallbackFlower(container, isLarge = false) {
+                const fallback = document.createElement('div');
+                fallback.className = 'fallback-flower ' + flowerType;
+                // Use innerHTML for better emoji rendering
+                fallback.innerHTML = flowerType === 'sunflower' ? '🌻' : '🌹';
+                container.appendChild(fallback);
+                
+                if (isLarge) {
+                    container.classList.add('large');
+                }
+            }
+            
+            // Grow a flower at the specified position
+            function growFlower(x, y, isLarge = false) {
+                const container = document.createElement('div');
+                container.className = `flower-container ${flowerType}`;
+                
+                // Get container size based on flower type and size
+                let containerSize;
+                if (isLarge) {
+                    containerSize = 300;
+                    container.classList.add('large');
+                } else {
+                    containerSize = flowerType === 'sunflower' ? 180 : 140;
+                }
+                
+                container.style.left = `${x - containerSize/2}px`;
+                container.style.top = `${y - containerSize/2}px`;
+                
+                document.body.appendChild(container);
+                flowers.push(container);
+                
+                // Create emoji flower
+                createFallbackFlower(container, isLarge);
+                
+                // Make flowers fall to the ground position
+                setTimeout(() => {
+                    const groundRect = ground.getBoundingClientRect();
+                    const finalY = groundRect.top - containerSize/2; // Position just above the ground
+                    container.style.top = `${finalY}px`;
+                }, 100);
+                
+                if (!isLarge) {
+                    showMessage(`¡Has plantado un ${flowerType === 'sunflower' ? 'girasol' : 'rosa'} para Alison! 💛`);
+                }
+            }
+            
+            function showMessage(text) {
+                message.textContent = text;
+                message.classList.add('visible');
+                
+                clearTimeout(message.timeout);
+                message.timeout = setTimeout(() => {
+                    message.classList.remove('visible');
+                }, 3000);
+            }
+            
+            // Show surprise message
+            function showSurpriseMessage() {
+                const messageText = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+                const messageEl = document.createElement('div');
+                messageEl.className = 'surprise-message';
+                messageEl.textContent = messageText;
+                messageEl.style.width = '100%';
+                messageEl.style.textAlign = 'center';
+                messageEl.style.top = `${Math.random() * 40 + 30}%`;
+                messageEl.style.left = '0';
+                
+                document.body.appendChild(messageEl);
+                
+                setTimeout(() => {
+                    messageEl.remove();
+                }, 7000);
+            }
+            
+            // Toggle flower type
+            function toggleFlowerType() {
+                flowerType = flowerType === 'sunflower' ? 'rose' : 'sunflower';
+                toggleBtn.textContent = flowerType === 'sunflower' ? 'Cambiar a rosas' : 'Cambiar a girasoles';
+                showMessage(`Ahora plantarás ${flowerType === 'sunflower' ? 'girasoles' : 'rosas'} 💛`);
+            }
+            
+            // Special effect - flower shower with large flowers
+            function specialEffect() {
+                showMessage('¡Sorpresa especial para Alison! 💛✨');
+                createConfetti();
+                
+                // Show multiple surprise messages with delay
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        showSurpriseMessage();
+                    }, i * 2000);
+                }
+                
+                // Create large flowers at random positions
+                for (let i = 0; i < 6; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
+                        const y = Math.random() * window.innerHeight * 0.5 + 100;
+                        growFlower(x, y, true);
+                    }, i * 400);
+                }
+                
+                // Heart shape with large flowers
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                const size = Math.min(window.innerWidth, window.innerHeight) * 0.3;
+                
+                const heartPoints = 12;
+                for (let i = 0; i < heartPoints; i++) {
+                    setTimeout(() => {
+                        const t = (i / heartPoints) * Math.PI * 2;
+                        
+                        // Heart shape parametric equation
+                        const x = centerX + size * 16 * Math.pow(Math.sin(t), 3);
+                        const y = centerY - size * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                        
+                        // Alternate between flower types
+                        flowerType = i % 2 === 0 ? 'sunflower' : 'rose';
+                        growFlower(x, y, true);
+                    }, i * 300 + 2000);
+                }
+                
+                // Create floating hearts all over the screen
+                for (let i = 0; i < 50; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.className = 'heart';
+                        heart.innerHTML = '❤️';
+                        heart.style.left = `${Math.random() * window.innerWidth}px`;
+                        heart.style.top = `${Math.random() * window.innerHeight}px`;
+                        heart.style.fontSize = `${Math.random() * 2 + 1.5}rem`;
+                        heart.style.animationDuration = `${Math.random() * 3 + 3}s`;
+                        
+                        document.body.appendChild(heart);
+                        
+                        setTimeout(() => {
+                            heart.remove();
+                        }, 7000);
+                    }, i * 100 + 1000);
+                }
+            }
+            
+            // Reset all flowers
+            function resetFlowers() {
+                flowers.forEach(flower => flower.remove());
+                flowers = [];
+                showMessage('Comenzemos de nuevo 🌱');
+            }
+            
+            // Event listeners
+            resetBtn.addEventListener('click', resetFlowers);
+            specialBtn.addEventListener('click', specialEffect);
+            toggleBtn.addEventListener('click', toggleFlowerType);
+            
+            // Responsive adjustment
+            window.addEventListener('resize', () => {
+                if (mainContent.classList.contains('visible')) {
+                    createName();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
